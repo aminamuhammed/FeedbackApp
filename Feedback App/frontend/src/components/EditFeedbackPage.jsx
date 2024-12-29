@@ -1,12 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
-const AddFeedback = () => {
+const EditFeedbackPage = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: "", comments: "", rating: "" });
+  const location = useLocation();
+
+  const feedbackItem = location.state?.feedback; // Get the feedback data passed from the Dashboard
+
+  const [formData, setFormData] = useState({
+    name: "",
+    comments: "",
+    rating: ""
+  });
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
+
+  useEffect(() => {
+    if (feedbackItem) {
+      setFormData(feedbackItem); // Set the form data to the current feedback details
+    }
+  }, [feedbackItem]);
 
   // Handle input change
   const handleChange = (e) => {
@@ -29,18 +43,18 @@ const AddFeedback = () => {
     }
 
     try {
-      await axios.post("http://localhost:3000/course/addfeedback", formData);
-      setSuccess("Feedback added successfully!");
+      await axios.put(`http://localhost:3000/course/updatefeedback/${formData._id}`, formData);
+      setSuccess("Feedback updated successfully!");
       setTimeout(() => navigate("/"), 2000); // Navigate back after success message
     } catch (err) {
-      setError("Failed to submit feedback.");
+      setError("Failed to update feedback.");
       console.error(err);
     }
   };
 
   return (
     <div style={{ maxWidth: "600px", margin: "auto", padding: "20px" }}>
-      <h2 style={{ textAlign: "center" }}>Add Feedback</h2>
+      <h2 style={{ textAlign: "center" }}>Edit Feedback</h2>
       {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
       {success && <p style={{ color: "green", textAlign: "center" }}>{success}</p>}
       <form onSubmit={handleSubmit}>
@@ -51,7 +65,13 @@ const AddFeedback = () => {
             name="name"
             value={formData.name}
             onChange={handleChange}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginBottom: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc"
+            }}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
@@ -61,7 +81,13 @@ const AddFeedback = () => {
             name="comments"
             value={formData.comments}
             onChange={handleChange}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginBottom: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc"
+            }}
           />
         </div>
         <div style={{ marginBottom: "15px" }}>
@@ -71,7 +97,13 @@ const AddFeedback = () => {
             name="rating"
             value={formData.rating}
             onChange={handleChange}
-            style={{ width: "100%", padding: "8px", marginBottom: "10px" }}
+            style={{
+              width: "100%",
+              padding: "8px",
+              marginBottom: "10px",
+              borderRadius: "4px",
+              border: "1px solid #ccc"
+            }}
           />
         </div>
         <button
@@ -85,11 +117,11 @@ const AddFeedback = () => {
             borderRadius: "4px",
           }}
         >
-          Submit Feedback
+          Update Feedback
         </button>
       </form>
     </div>
   );
 };
 
-export default AddFeedback;
+export default EditFeedbackPage;
